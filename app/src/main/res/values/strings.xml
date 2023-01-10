@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">PermissionSample</string>
     <string name="button">権限チェック開始</string>
+    <string name="pattern_1">パターン1</string>
+    <string name="pattern_2">パターン2</string>
+    <string name="pattern_3">パターン3</string>
+    <string name="pattern_4">パターン4</string>
+    <string name="defaultPattern">標準</string>
 </resources>

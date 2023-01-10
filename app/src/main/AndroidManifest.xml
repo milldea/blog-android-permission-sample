@@ -27,6 +27,22 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <activity
+            android:name=".DefaultActivity"
+            android:exported="true" />
+        <activity
+            android:name=".Pattern1Activity"
+            android:exported="true" />
+        <activity
+            android:name=".Pattern2Activity"
+            android:exported="true" />
+        <activity
+            android:name=".Pattern3Activity"
+            android:exported="true" />
+        <activity
+            android:name=".Pattern4Activity"
+            android:exported="true" />
+
     </application>
 
 </manifest>
