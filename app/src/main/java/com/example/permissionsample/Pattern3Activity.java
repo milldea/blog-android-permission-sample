@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class Pattern3Activity extends AppCompatActivity {
     private TextView permissionView;
+    private boolean showSystemDialog = false;
     private final String UNAUTHORIZED = "UNAUTHORIZED";
     private final String AUTHORIZED = "AUTHORIZED";
     private final String PREFERENCE_NAME = "PERMISSION_SAMPLE";
@@ -53,16 +53,14 @@ public class Pattern3Activity extends AppCompatActivity {
                             requestPermission(permissions);
                         })
                         .show();
+                showSystemDialog = true;
             } else {
                 // SharedPreferences に権限状態を保持しておいて比較する（パターン3）
                 SharedPreferences pref = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE);
                 boolean ACCESS_COARSE_LOCATION = pref.getBoolean(Manifest.permission.ACCESS_COARSE_LOCATION, false);
                 boolean ACCESS_FINE_LOCATION = pref.getBoolean(Manifest.permission.ACCESS_FINE_LOCATION, false);
-                if (ACCESS_COARSE_LOCATION != shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION) &&
-                        ACCESS_FINE_LOCATION != shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
-                ) {
-                    Log.d("permission sample", "判定パターン3");
-                }
+                showSystemDialog = ACCESS_COARSE_LOCATION == shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION) ||
+                        ACCESS_FINE_LOCATION == shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION);
 
                 requestPermission(permissions);
             }
@@ -79,13 +77,17 @@ public class Pattern3Activity extends AppCompatActivity {
             editor.putBoolean(Manifest.permission.ACCESS_COARSE_LOCATION, true);
             editor.putBoolean(Manifest.permission.ACCESS_FINE_LOCATION, true);
             editor.apply();
-
         }
 
 
         for (int result : grantResults) {
             // 1つでも拒否されていたら、要求する
             if (result != PackageManager.PERMISSION_GRANTED) {
+                permissionView.setText(UNAUTHORIZED);
+                if (showSystemDialog) {
+                    showSystemDialog = false;
+                    return;
+                }
                 new AlertDialog.Builder(Pattern3Activity.this)
                         .setMessage("位置情報が許可されていません")
                         .setPositiveButton("設定画面へ", (dialogInterface, i) -> openSettings())

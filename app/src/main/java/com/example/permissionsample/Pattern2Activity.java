@@ -64,19 +64,13 @@ public class Pattern2Activity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // 100 ミリ秒いないなら、システムダイアログが出ていないと判定（パターン2）
-        if (System.currentTimeMillis() - requestTime < 100) {
-            Log.d("permission sample", "判定パターン2");
-        }
-
         for (int result : grantResults) {
-            // OS のダイアログを表示していたら抜ける
-            if (showSystemDialog) {
-                showSystemDialog = false;
-                break;
-            }
-            // 1つでも拒否されていたら、要求する
             if (result != PackageManager.PERMISSION_GRANTED) {
+                permissionView.setText(UNAUTHORIZED);
+                if (System.currentTimeMillis() - requestTime > 100) {
+                    return;
+                }
+
                 new AlertDialog.Builder(Pattern2Activity.this)
                         .setMessage("位置情報が許可されていません")
                         .setPositiveButton("設定画面へ", (dialogInterface, i) -> openSettings())

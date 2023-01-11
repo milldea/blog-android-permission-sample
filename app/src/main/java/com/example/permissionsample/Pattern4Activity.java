@@ -2,6 +2,7 @@ package com.example.permissionsample;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -59,21 +60,28 @@ public class Pattern4Activity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        String PREFERENCE_NAME = "PERMISSION_SAMPLE";
+        String SHOW_SYSTEM_DIALOG = "PERMISSION_SAMPLE";
+        SharedPreferences pref = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE);
+        boolean showSystemDialog = pref.getBoolean(SHOW_SYSTEM_DIALOG, true);
         if (grantResults[0] != PackageManager.PERMISSION_GRANTED &&
                 grantResults[1] != PackageManager.PERMISSION_GRANTED) {
             // 次に出ない状態かどうかを見分ける（パターン4）
             // （今回出なかったどうかの判定ではない）
-            if (!shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION) &&
-                    !shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
-            ) {
-                Log.d("permission sample", "判定パターン4");
-            }
+            SharedPreferences.Editor editor = pref.edit();
+            editor.putBoolean(SHOW_SYSTEM_DIALOG, shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION) ||
+                    shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION));
+            editor.apply();
         }
 
 
         for (int result : grantResults) {
             // 1つでも拒否されていたら、要求する
             if (result != PackageManager.PERMISSION_GRANTED) {
+                permissionView.setText(UNAUTHORIZED);
+                if (showSystemDialog) {
+                    return;
+                }
                 new AlertDialog.Builder(Pattern4Activity.this)
                         .setMessage("位置情報が許可されていません")
                         .setPositiveButton("設定画面へ", (dialogInterface, i) -> openSettings())
