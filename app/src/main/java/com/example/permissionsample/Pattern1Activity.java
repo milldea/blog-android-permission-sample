@@ -30,6 +30,7 @@ public class Pattern1Activity extends AppCompatActivity {
         // OS のダイアログを表示していた場合（パターン1）
         Thread thread = new Thread(() -> {
             try {
+                // sleep の秒数は実際に検証する OS, 端末でよくご確認ください
                 sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
